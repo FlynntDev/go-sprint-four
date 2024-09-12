@@ -71,8 +71,8 @@ func ShowTrainingInfo(action int, trainingType string, duration, weight, height 
 
 // Константы для расчета калорий, расходуемых при беге.
 const (
-// runningCaloriesMeanSpeedMultiplier = 18   // множитель средней скорости.
-// runningCaloriesMeanSpeedShift      = 1.79 // среднее количество сжигаемых калорий при беге.
+	runningCaloriesMeanSpeedMultiplier = 18   // множитель средней скорости.
+	runningCaloriesMeanSpeedShift      = 1.79 // среднее количество сжигаемых калорий при беге.
 )
 
 // RunningSpentCalories возвращает количество потраченных колорий при беге.
@@ -83,13 +83,13 @@ const (
 // weight float64 — вес пользователя.
 // duration float64 — длительность тренировки в часах.
 func RunningSpentCalories(action int, weight, duration float64) float64 {
-	return float64(((18 * meanSpeed(action, duration) * 1.79) * weight / mInKm * duration * minInH))
+	return float64(((runningCaloriesMeanSpeedMultiplier * meanSpeed(action, duration) * runningCaloriesMeanSpeedShift) * weight / mInKm * duration * minInH))
 }
 
 // Константы для расчета калорий, расходуемых при ходьбе.
 const (
-// walkingCaloriesWeightMultiplier = 0.035 // множитель массы тела.
-// walkingSpeedHeightMultiplier    = 0.029 // множитель роста.
+	walkingCaloriesWeightMultiplier = 0.035 // множитель массы тела.
+	walkingSpeedHeightMultiplier    = 0.029 // множитель роста.
 )
 
 // WalkingSpentCalories возвращает количество потраченных калорий при ходьбе.
@@ -101,14 +101,15 @@ const (
 // weight float64 — вес пользователя.
 // height float64 — рост пользователя.
 func WalkingSpentCalories(action int, duration, weight, height float64) float64 {
-	// ваш код здесь
-	return float64(((0.035*weight + (math.Pow(meanSpeed(action, duration), 2)/height)*0.029*weight) * duration * minInH))
+	meanSpeedSec := meanSpeed(action, duration) * kmhInMsec
+	height = height / 100
+	return ((walkingCaloriesWeightMultiplier*weight + (math.Pow(meanSpeedSec, 2)/height)*walkingSpeedHeightMultiplier*weight) * duration * minInH)
 }
 
 // Константы для расчета калорий, расходуемых при плавании.
 const (
-// swimmingCaloriesMeanSpeedShift   = 1.1 // среднее количество сжигаемых колорий при плавании относительно скорости.
-// swimmingCaloriesWeightMultiplier = 2   // множитель веса при плавании.
+	swimmingCaloriesMeanSpeedShift   = 1.1 // среднее количество сжигаемых колорий при плавании относительно скорости.
+	swimmingCaloriesWeightMultiplier = 2   // множитель веса при плавании.
 )
 
 // swimmingMeanSpeed возвращает среднюю скорость при плавании.
@@ -135,5 +136,5 @@ func swimmingMeanSpeed(lengthPool, countPool int, duration float64) float64 {
 // weight float64 — вес пользователя.
 func SwimmingSpentCalories(lengthPool, countPool int, duration, weight float64) float64 {
 	// ваш код здесь
-	return float64((swimmingMeanSpeed(lengthPool, countPool, duration) + 1.1) * 2 * weight * duration)
+	return float64((swimmingMeanSpeed(lengthPool, countPool, duration) + swimmingCaloriesMeanSpeedShift) * swimmingCaloriesWeightMultiplier * weight * duration)
 }
